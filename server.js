@@ -127,10 +127,102 @@ function runApp(){
                 connection.query(query, function (err, res){
                     if (err) throw err;
                     console.table(res);
-                    runApp;
+                    runApp();
                 });
             });
     }
 
-    
+    function addRole(){
+        inquirer
+            .prompt([
+                {
+                    type: "input",
+                    message: "Enter the job title you want to add.\n",
+                    name: "jobTitle",
+                },
+                {
+                    type: "input",
+                    message: "Enter the job's salary.\n",
+                    name: "salary",
+                },
+                {
+                    type: "input",
+                    message: "What is the job's department ID?\n",
+                    name: "departmentID",
+                },
+            ])
+            .then(function (res){
+                const jobTitle = res.jobTitle;
+                const salary = res.salary;
+                const departmentID = res.departmentID;
+                const query = `INSERT INTO role (job_title, salary, department_id) VALUE("${jobTitle}", "${salary}", "${departmentID}")`;
+                connection.query(query, function (err, res){
+                    if (err) throw err;
+                    console.table(res);
+                    runApp();
+                });
+            });
+    }
+
+    function addDepartment(){
+        inquirer
+            .prompt([
+                {
+                    type: "input",
+                    message: "Enter the department name you want to add.\n",
+                    name: "department",
+                },
+            ])
+            .then(function (res){
+                const department = res.department;
+                const query = `INSERT INTO department (department_name) VALUE("${department}")`;
+                connection.query(query, function (err, res){
+                    if (err) throw err;
+                    console.table(res);
+                    runApp();
+                });
+            });
+    }
+
+    function updateEmployeeRole(){
+        viewEmployees();
+        inquirer
+            .prompt({
+                    type: "input",
+                    message: "Enter the ID of the employee that you want to update.\n",
+                    name: "employeeID",
+                })
+            .then((answer) =>{
+                const employeeID = answer.employeeID;
+                viewRoles();
+
+                inquirer
+                    .prompt({
+                        name: "roleID",
+                        type: "input",
+                        message: "Enter the role ID you want the employee to have\n",
+                    })
+                    .then((answer) => {
+                        console.log("Updating employee role...\n");
+                        connection.query(
+                            "UPDATE employee SET ? WHERE ?",
+                            [
+                                {
+                                    role_id: answer.roleID,
+                                },
+                                {
+                                    id: employeeID,
+                                },
+                            ],
+                            function (err, res){
+                                if (err) throw err;
+                                console.log("The employee's role has been updated\n");
+                                runApp();
+                            }
+                        );
+                    });
+            });
+    }
 }
+
+runApp();
